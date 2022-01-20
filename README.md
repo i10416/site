@@ -1,4 +1,7 @@
+[![build](https://github.com/i10416/site/actions/workflows/build.yaml/badge.svg)](https://github.com/i10416/site/actions/workflows/build.yaml)
+
 ## MEMO
+
 
 
 ## TODO & Idea
