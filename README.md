@@ -1,4 +1,5 @@
 [![build](https://github.com/i10416/site/actions/workflows/build.yaml/badge.svg)](https://github.com/i10416/site/actions/workflows/build.yaml)
+[![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/s01.oss.sonatype.org/dev.i10416/petit_3.svg)](https://s01.oss.sonatype.org/content/repositories/snapshots/dev/i10416/petit_3/)
 
 ## MEMO
 
