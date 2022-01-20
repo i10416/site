@@ -4,6 +4,8 @@ on:
     branches:
       - main
       - master
+    paths-ignore:
+      - 'infra/**'
 env:
   GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
   GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -39,7 +41,7 @@ jobs:
       - name: run app
         run: |
           gcloud run deploy ${{ secrets.RUN_SERVICE }} \
-          --image asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cloudrun/${{ secrets.RUN_SERVICE }}:${GITHUB_SHA::7} \
+          --image asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cloudrun/${{ secrets.RUN_SERVICE }}:latest \
           --project ${{ secrets.GCP_PROJECT_ID }} \
           --region ${{ secrets.GCP_REGION }}
 
