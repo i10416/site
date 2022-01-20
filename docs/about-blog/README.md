@@ -1,3 +1,9 @@
+## サイトの構成
+
+GCP の cloud run に nginx コンテナをデプロイして静的ファイルを配信している.
+
+インフラ構成は https://github.com/i10416/infra.git と https://github.com/i10416/site.git の infra で
+terraform を使って管理している.
 ## ブログの機能
 
 ### テキスト
