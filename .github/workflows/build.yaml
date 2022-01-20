@@ -35,8 +35,8 @@ jobs:
       - name: push server image
         run: |
           cd deploy
-          docker build -t asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cloudrun/${{ secrets.RUN_SERVICE }}:${GITHUB_SHA::7} .
-          docker push asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cloudrun/${{ secrets.RUN_SERVICE }}:${GITHUB_SHA::7}
+          docker build -t asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cloudrun/${{ secrets.RUN_SERVICE }}:latest .
+          docker push asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cloudrun/${{ secrets.RUN_SERVICE }}:latest
 
       - name: run app
         run: |
