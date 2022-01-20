@@ -1,0 +1,44 @@
+name: build
+on:
+  push:
+    branches:
+      - main
+      - master
+env:
+  GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_REGION: ${{ secrets.GCP_REGION }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: setup scala CLI
+        run: curl -sSLf https://virtuslab.github.io/scala-cli-packages/scala-setup.sh | sh
+      - name: transform docs
+        run: |
+          mkdir -p deploy/dist
+          scala-cli run transform.scala -- docs deploy/dist
+      - name: GCP Auth
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: 'latest'
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+      - name: Configure docker to use gcloud cli
+        run: gcloud auth configure-docker --quiet
+      - name: push server image
+        run: |
+          cd deploy
+          docker build -t asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cloudrun/${{ secrets.RUN_SERVICE }}:${GITHUB_SHA::7} .
+          docker push asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cloudrun/${{ secrets.RUN_SERVICE }}:${GITHUB_SHA::7}
+
+      - name: run app
+        run: |
+          gcloud run deploy ${{ secrets.RUN_SERVICE }} \
+          --image asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/cloudrun/${{ secrets.RUN_SERVICE }}:${GITHUB_SHA::7} \
+          --project ${{ secrets.GCP_PROJECT_ID }} \
+          --region ${{ secrets.GCP_REGION }}
+
