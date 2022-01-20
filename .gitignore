@@ -1,0 +1,9 @@
+.metals
+.vscode
+.scala
+dist
+.ammonite
+**/*.tfvars
+**/secrets/*.json
+**/.terraform
+.bsp
