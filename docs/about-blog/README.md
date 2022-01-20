@@ -4,6 +4,23 @@ GCP の cloud run に nginx コンテナをデプロイして静的ファイル�
 
 インフラ構成は https://github.com/i10416/infra.git と https://github.com/i10416/site.git の infra で
 terraform を使って管理している.
+
+## GCP で 静的サイトをホスティングするときのユースケース
+
+選択肢にあがるのは
+
+1. cloud storage + load balancer
+2. app engine
+3. cloud run
+
+1 は小規模なサイトだとロードバランサや固定 IP のコストがバカにならないので個人の静的ウェブサイトをホストするのには向いていない.
+
+
+2 は 無料枠、https 対応があり、app.yaml と gcloud コマンドさえあればほぼすぐにウェブサイトを公開できるくらいに簡単だが、terraform などの外部ツールとの食い合わせがやや悪い.
+
+
+3 はコンテナ以外の要素については自由に選択できるのでうれしい. 例えばビルドとデプロイは github actions で、ホスティングは cloud run で、といった使い分けがしやすい. お陰で terraform による構成管理も複雑にならない.
+
 ## ブログの機能
 
 ### テキスト
