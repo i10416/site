@@ -7,3 +7,4 @@ dist
 **/secrets/*.json
 **/.terraform
 .bsp
+.scala

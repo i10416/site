@@ -23,7 +23,10 @@ jobs:
         run: |
           source ~/.profile
           mkdir -p deploy/dist
-          scala-cli run transform.scala  --jar petit.jar -- docs deploy/dist
+          scala-cli run transform.scala  \
+            --dependency dev.i10416::petit:0.0.0+1-ce770e87-SNAPSHOT \
+            --repo https://s01.oss.sonatype.org/content/repositories/snapshots \
+            -- docs deploy/dist
       - name: GCP Auth
         uses: google-github-actions/setup-gcloud@v0
         with:
