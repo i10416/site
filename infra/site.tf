@@ -98,6 +98,7 @@ resource "google_cloud_run_service" "website" {
 
   template {
     spec {
+      service_account_name  = var.run_agent
       containers {
         image = "asia.gcr.io/${var.site_project_id}/cloudrun/${var.service_name}:latest"
       }
