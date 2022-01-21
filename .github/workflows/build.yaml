@@ -27,6 +27,8 @@ jobs:
             --dependency dev.i10416::petit:0.0.0+13-473cd1eb-SNAPSHOT \
             --repo https://s01.oss.sonatype.org/content/repositories/snapshots \
             -- docs deploy/dist
+        env:
+          SITE_HOST: ${{ secrets.SITE_HOST }}
       - name: GCP Auth
         uses: google-github-actions/setup-gcloud@v0
         with:
