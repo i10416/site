@@ -1,27 +1,29 @@
 ## サイトの構成
 
-GCP の cloud run に nginx コンテナをデプロイして静的ファイルを配信している.
+このサイトは GCP の cloud run に nginx コンテナをデプロイして静的ファイルを配信している.
 
-インフラ構成は https://github.com/i10416/infra.git と https://github.com/i10416/site.git の infra で
-terraform を使って管理している.
+インフラ構成は https://github.com/i10416/infra.git と https://github.com/i10416/site.git の infra ディレクトリにある `*.tf` で
+terraform を使って管理している. `terraform apply` と `terraform destroy` でインフラリソースをまとめて作成・破棄できるので楽しい(＾ω＾)
 
 ## GCP で 静的サイトをホスティングするときのユースケース
 
-選択肢にあがるのは
+選択肢は
 
-1. cloud storage + load balancer
-2. app engine
-3. cloud run
+1: cloud storage + load balancer
+2: app engine
+3: cloud run
 
-1 は小規模なサイトだとロードバランサや固定 IP のコストがバカにならないので個人の静的ウェブサイトをホストするのには向いていない.
-
-
-2 は 無料枠、https 対応があり、app.yaml と gcloud コマンドさえあればほぼすぐにウェブサイトを公開できるくらいに簡単だが、terraform などの外部ツールとの食い合わせがやや悪い.
+しかし、1 は小規模なサイトだとロードバランサや固定 IP のコストがバカにならないので個人の静的ウェブサイトをホストするのには向いていない. ちなみにスケールが大きくなれば cloud storage + load balancer の構成のコスパがいいようだ.
 
 
-3 はコンテナ以外の要素については自由に選択できるのでうれしい. 例えばビルドとデプロイは github actions で、ホスティングは cloud run で、といった使い分けがしやすい. お陰で terraform による構成管理も複雑にならない.
+2 は 無料枠、https 対応があり、app.yaml と gcloud コマンドさえあればほぼすぐにウェブサイトを公開できるくらいに簡単だが、terraform などの外部ツールとの食い合わせがやや悪い. 小規模なシステムなので cloud build による自動ビルドと app engine へのデプロイはオーバーキル.
 
-## ブログの機能
+
+3 はコンテナ以外の要素については自由に選択できるのでうれしい. 例えばビルドとデプロイは github actions で、ホスティングは cloud run で、といった使い分けがしやすい. お陰で terraform による構成管理も複雑にならない. ということでこのサイトは github actions と cloud run を使って管理することにしている.
+
+## サイトの機能
+
+よくある静的サイトの機能は一通り備えている.
 
 ### テキスト
 

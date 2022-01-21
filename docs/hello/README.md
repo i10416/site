@@ -1,8 +1,12 @@
 # Good Bye, Gatsby. Hello, Laika!
 
-[Laika](http://planet42.github.io/Laika/) でブログを作ったった(＾ω＾)
+以前のブログは Gatsby+TypeScript というアリがちな構成だったが、チョットしたウェブサイトを作るのにホントに graphql が必要なのかと胸に手を当てて考えてみるとそんなことはないという結論に至ってしまった. 
+というわけで Scala 使いの信仰を試す意味もあって[Laika](http://planet42.github.io/Laika/) でブログを作ったった(＾ω＾)
 
-[Laika](http://planet42.github.io/Laika/) は Scala で書かれたマークアップ変換ツールです.
+
+さて、[Laika](http://planet42.github.io/Laika/) は Scala で書かれたマークアップ変換ツールです.
+使い勝手はなかなかいい. Gatsby よりもメタな、SSG を作るためのライブラリといってもいいかもしれないです.
+
 
 入力したディレクトリやファイルの操作は仮想ツリー上で行います. この仕組みのおかげで Gatsby で graphql を使って処理していた機能を、
 仮想的なディレクトリ構造(木構造)の変換として処理することができます.
@@ -12,9 +16,9 @@
 InputTree
   .apply[F].addFile("./src/theme.css",Path.Root / "css" / "theme.css")
 ```
+このツリーの操作を介して OGP の生成やページの動的な生成もできるだろう.
 
-
-
+また、Laika には変換処理などをまとめた Directive という概念があります.
 ```scala
 import laika._
 import laika.directive.std.StandardDirectives
@@ -66,6 +70,8 @@ object MyDirectives extends DirectiveRegistry {
 }
 
 ```
+
+`cursor` はドキュメントやその周りのドキュメントの情報にアクセスできます. 木構造を操作するための API なので Scala の Json ライブラリの Circe や Argonaut に似た API 設計になっています.
 
 この theme の `addExtensions(MyDirectives)` で Directives を登録すれば、テンプレートから `@:prevDoc`,`@:nextDoc` を使って前後の記事へのリンクを生成することができます.
 
@@ -125,6 +131,5 @@ createTransformer[IO]
     </div>
   </body>
 </html>
-
 
 ```
