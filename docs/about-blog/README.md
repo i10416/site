@@ -5,6 +5,37 @@
 インフラ構成は https://github.com/i10416/infra.git と https://github.com/i10416/site.git の infra ディレクトリにある `*.tf` で
 terraform を使って管理している. `terraform apply` と `terraform destroy` でインフラリソースをまとめて作成・破棄できるので楽しい(＾ω＾)
 
+また、ウェブサイトのスタイルはテーマにしてライブラリとして公開しているのでディレクトリ構成を揃えれば誰でもｼｭｯと使えるはずである.
+
+ソースは以下のレポジトリに置いてある.
+
+https://github.com/i10416/petit
+
+
+Scala-CLI なら以下のように
+
+```scala
+// using lib dev.i10416::petit:0.0.0-xxxxx-SNAPSHOT`
+```
+
+
+ammonite script なら以下のように,
+
+```scala
+import $ivy.`dev.i10416::petit:0.0.0-xxxxx-SNAPSHOT`
+```
+
+
+`build.sbt` なら以下のように
+
+```scala
+libraryDependencies ++= Seq(
+  "dev.110416" %% "petit" % "0.0.0-xxxx-SNAPSHOT"
+)
+```
+
+と書いてダウンロードしてほしい.
+
 ## GCP で 静的サイトをホスティングするときのユースケース
 
 選択肢は
