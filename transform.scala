@@ -3,10 +3,6 @@
 // using lib org.planet42::laika-io:0.18.1
 // using lib org.typelevel::cats-effect:3.3.4
 
-// import $ivy.`org.planet42::laika-core:0.18.1`
-// import $ivy.`org.planet42::laika-preview:0.18.1`
-// import $ivy.`org.planet42::laika-io:0.18.1`
-// import $ivy.`org.typelevel:::cats-effect:3.3.1`
 import java.nio.file.Path
 import java.nio.file.Files
 import cats.effect.{Async, Resource}
@@ -17,6 +13,14 @@ import cats.effect.IO
 import laika.api._
 import cats.effect.unsafe.implicits.global
 import laika.io.implicits._
+import laika.io.model.TreeOutput
+import laika.io.model.StringTreeOutput
+import laika.theme.ThemeProvider
+import laika.theme.Theme
+import laika.theme.ThemeBuilder
+import laika.config.ConfigBuilder
+import cats.effect.kernel.Sync
+import java.nio.charset.Charset
 
 object Transform {
   private def createTransformer[F[_]: Async]: Resource[F, TreeTransformer[F]] =
@@ -34,6 +38,10 @@ object Transform {
         (from, to)
       case _ => ("docs", "deploy/dist")
     }
+    Files.write(
+      Path.of("docs/directory.conf"),
+      s"""petit.site.host  = "${System.getenv("SITE_HOST")}"""".getBytes()
+    )
     createTransformer[IO]
       .use { transformer =>
         transformer.fromDirectory(from).toDirectory(to).transform
