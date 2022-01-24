@@ -4,21 +4,23 @@
 というわけで Scala 使いの信仰を試す意味もあって[Laika](http://planet42.github.io/Laika/) でブログを作ったった(＾ω＾)
 
 
-さて、[Laika](http://planet42.github.io/Laika/) は Scala で書かれたマークアップ変換ツールです.
-使い勝手はなかなかいい. Gatsby よりもメタな、SSG を作るためのライブラリといってもいいかもしれないです.
+さて、[Laika](http://planet42.github.io/Laika/) は Scala で書かれたマークアップ変換ツールだ.
+使い勝手はなかなかいい. Gatsby よりもメタな、SSG を作るためのライブラリといってもいいかもしれない.
 
 
-入力したディレクトリやファイルの操作は仮想ツリー上で行います. この仕組みのおかげで Gatsby で graphql を使って処理していた機能を、
-仮想的なディレクトリ構造(木構造)の変換として処理することができます.
-例えば以下のコードは、手元の `src` ディレクトリにある `theme.css` を仮想ディレクトリツリーの `root/css/theme.css` にマウントします.
-このツリーを使うコードは仮想ツリーから `theme.css` にアクセスすることができます.
+入力したディレクトリやファイルの操作は仮想ツリー上で行う. この仕組みのおかげで Gatsby で graphql を使って処理していた機能を、
+仮想的なディレクトリ構造(木構造)の変換として処理することができる.
+例えば以下のコードは、手元の `src` ディレクトリにある `theme.css` を仮想ディレクトリツリーの `root/css/theme.css` にマウントする.
+
+このツリーを使うコードは仮想ツリーから `theme.css` にアクセスすることができる.
+
 ```scala
 InputTree
   .apply[F].addFile("./src/theme.css",Path.Root / "css" / "theme.css")
 ```
 このツリーの操作を介して OGP の生成やページの動的な生成もできるだろう.
 
-また、Laika には変換処理などをまとめた Directive という概念があります.
+また、Laika には変換処理などをまとめた ExtensionBundle や Directive という概念がある.
 ```scala
 import laika._
 import laika.directive.std.StandardDirectives
@@ -26,9 +28,9 @@ import laika.markdown.github.GitHubFlavor
 import laika.parse.code.SyntaxHighlighting
 ```
 Directives は markup(例えば、`markdown`) や template(例えば、`default.template.html`)
-に埋め込んで文書を拡張するための概念です.
+に埋め込んで文書を拡張するための概念.
 
-以下のように theme に Directives を渡すことで テンプレートやマークアップから Directive を使うことができます.
+以下のように theme に Directives を渡すことで テンプレートやマークアップから Directive を使うことができる.
 
 ```scala
 def style[F[_]:Sync] = InputTree
@@ -43,7 +45,7 @@ def myThemeBuilder[F[_]: Sync] = ThemeBuilder
   .build
 ```
 
-直前のページ、直後のページへのリンクを動的に生成する Directive は次のように定義できます.
+直前のページ、直後のページへのリンクを動的に生成する Directive は次のように定義できる.
 
 ```scala
 val prevDoc = Templates.create("prevDoc") {
@@ -71,12 +73,12 @@ object MyDirectives extends DirectiveRegistry {
 
 ```
 
-`cursor` はドキュメントやその周りのドキュメントの情報にアクセスできます. 木構造を操作するための API なので Scala の Json ライブラリの Circe や Argonaut に似た API 設計になっています.
+`cursor` はドキュメントやその周りのドキュメントの情報にアクセスできる. 木構造を操作するための API なので Scala の Json ライブラリの Circe や Argonaut に似た API 設計になっている.
 
-この theme の `addExtensions(MyDirectives)` で Directives を登録すれば、テンプレートから `@:prevDoc`,`@:nextDoc` を使って前後の記事へのリンクを生成することができます.
+この theme の `addExtensions(MyDirectives)` で Directives を登録すれば、テンプレートから `@:prevDoc`,`@:nextDoc` を使って前後の記事へのリンクを生成することができる.
 
 
-theme は、directives, 静的アセット、文書の仮想的なディレクトリ構造を保持するツリーの変換器(TreeProcessor)などを持ちます.
+theme は、directives, 静的アセット、文書の仮想的なディレクトリ構造を保持するツリーの変換器(TreeProcessor)などを持つ.
 
 
 ```scala
@@ -91,7 +93,7 @@ def createTransformer[F[_]: Async]: Resource[F, TreeTransformer[F]] =
     .build
 ```
 
-入力フォーマット、出力フォーマット、テーマを指定してマークアップ変換処理を定義します.
+入力フォーマット、出力フォーマット、テーマを指定してマークアップ変換処理を定義できる.
 
 ```scala
 createTransformer[IO]
@@ -101,9 +103,9 @@ createTransformer[IO]
   .unsafeRunSync()
 ```
 
-`src`ディレクトリにある `*.md` ファイルを `dist` ディレクトリに HTML 形式に変換して出力します.
+これは `src`ディレクトリにある `*.md` ファイルを `dist` ディレクトリに HTML 形式に変換して出力する.
 
-文書のレイアウトは `src` ディレクトリに置かれた `default.template.html` に従います.
+文書のレイアウトは `src` ディレクトリに置かれた `default.template.html` に従う.
 
 ```laika-html
 <!DOCTYPE html>

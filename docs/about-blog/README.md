@@ -36,19 +36,25 @@ libraryDependencies ++= Seq(
 
 と書いてダウンロードしてほしい.
 
+ディレクトリ構成などは https://github.com/i10416/site を参考にしてほしい.
 ## GCP で 静的サイトをホスティングするときのユースケース
 
 選択肢は
 
 1: cloud storage + load balancer
+
 2: app engine
+
 3: cloud run
+
+4: firebase hosting
 
 しかし、1 は小規模なサイトだとロードバランサや固定 IP のコストがバカにならないので個人の静的ウェブサイトをホストするのには向いていない. ちなみにスケールが大きくなれば cloud storage + load balancer の構成のコスパがいいようだ.
 
 
 2 は 無料枠、https 対応があり、app.yaml と gcloud コマンドさえあればほぼすぐにウェブサイトを公開できるくらいに簡単だが、terraform などの外部ツールとの食い合わせがやや悪い. 小規模なシステムなので cloud build による自動ビルドと app engine へのデプロイはオーバーキル.
 
+4 は安い・速い・楽の三点セットがそろっているが面白みに欠ける.
 
 3 はコンテナ以外の要素については自由に選択できるのでうれしい. 例えばビルドとデプロイは github actions で、ホスティングは cloud run で、といった使い分けがしやすい. お陰で terraform による構成管理も複雑にならない. ということでこのサイトは github actions と cloud run を使って管理することにしている.
 
@@ -58,7 +64,7 @@ libraryDependencies ++= Seq(
 
 ### テキスト
 
-orem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+orem ipsum dolor sit amet, __consectetur adipiscing__ elit, sed do **eiusmod** tempor incididunt ~~ut labore~~ et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
 
 ### シンタックスハイライト
 
@@ -84,17 +90,26 @@ lazy val hoge = {
 
 ### Info,Warning など
 
+Directive という Laika の機能を使うことで以下の `info`, `warning`, `error`  のような拡張シンタックスが使える.
+
+他にもいろいろな機能があるので詳細については https://planet42.github.io/Laika/0.18/07-reference/01-standard-directives.html を見てほしい.
+
+```
+@:callout(info)
+Info.
+@:@
+```
 
 @:callout(info)
-This is a info.
+Info.
 @:@
 
 @:callout(warning)
-This is a warning.
+Warning.
 @:@
 
 @:callout(error)
-This is Error.
+Error.
 @:@
 
 
