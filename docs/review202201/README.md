@@ -7,11 +7,15 @@ TypeScript&Gatsby から Scala&Laika に移行した. さようなら JS (＾ω�
 
 これでテーマや拡張機能も全部 Scala で作れる. うれしいですね(＾ω＾)
 
+
 ソースコードは https://github.com/i10416/site においてある. netlify や vercel にホストするのは芸がないので
-github actions と cloud run でGithub に Push -> 自動デプロイのワークフローを組んだ. 
-インフラは terraform で GCP のインフラを管理している.
+github actions と cloud run でGithub に Push -> 自動デプロイのワークフローを組んだ. インフラは terraform で GCP のインフラを管理している.
+
+デプロイには scala-cli も使っている. チョットしたスクリプトを書くだけならセットアップしなくてもすぐに使えていい.
+
 
 ちなみに Scala 3 の次のリリースには Scaladoc の改善が含まれていて、それには SSG 機能も付いているらしい(´･ω･｀) こっちでやるべきだったか？
+
 
 ## 統計
 
