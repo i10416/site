@@ -8,3 +8,4 @@ dist
 **/.terraform
 .bsp
 .scala
+.scala-build
