@@ -47,7 +47,7 @@ https://github.com/i10416/munkres
 
 https://github.com/i10416/dart-modules/tree/master/flechette
 
-```
+```yaml
 dependencies:
   flechette: ^0.0.1
 ```
@@ -55,6 +55,8 @@ dependencies:
 Dart の拡張メソッドは実質ただの関数なので null や nullable な値に対して使っても安全なのでいろいろと捗る.
 
 こんなふうに `t` が nullable でも安心してメソッドチェーンを書ける.
+
+(Laika のシンタックスハイライト、`Alloy` や `Dhall` には対応してるのに `Dart` には対応してなくて草.)
 
 ```dart
 T? t = ???;
