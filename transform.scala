@@ -1,7 +1,7 @@
-// using scala 2.13
-// using lib org.planet42::laika-core:0.18.1
-// using lib org.planet42::laika-io:0.18.1
-// using lib org.typelevel::cats-effect:3.3.4
+//> using scala 2.13
+//> using lib org.planet42::laika-core:0.18.1
+//> using lib org.planet42::laika-io:0.18.1
+//> using lib org.typelevel::cats-effect:3.3.4
 
 import java.nio.file.Path
 import java.nio.file.Files
