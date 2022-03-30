@@ -35,15 +35,22 @@ def watcher = fs2.io.Watcher.default[IO]
 def res = for {
   w <- watcher
   t <- createTransformer[IO]
-} yield (w,t)
+} yield (w, t)
 
-res.use {case(w,t) =>
+res.use { case (w, t) =>
   for {
     // todo: how to watch recursively?
     _ <- w.register(Path.apply("docs").toNioPath)
-    _ <- w.events().filter{case Created(path, count) => println("created"); true
-  case Modified(path, count) => println("modified");true
-case Deleted(path, count) =>  println("deleted");true
-case _ => println("nope");false}.evalMap(_ => t.fromDirectory("docs").toDirectory("dist").transform).compile.drain
+    _ <- w
+      .events()
+      .filter {
+        case Created(path, count)  => println("created"); true
+        case Modified(path, count) => println("modified"); true
+        case Deleted(path, count)  => println("deleted"); true
+        case _                     => println("nope"); false
+      }
+      .evalMap(_ => t.fromDirectory("docs").toDirectory("dist").transform)
+      .compile
+      .drain
   } yield ()
 }

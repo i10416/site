@@ -13,10 +13,12 @@ import cats.effect.ExitCode
 import cats.effect.unsafe.implicits.global
 
 @main
-def run()= server.EmberServerBuilder
+def run() = server.EmberServerBuilder
   .default[IO]
   .withHost(Host.fromString("0.0.0.0").get)
   .withPort(Port.fromInt(8989).get)
   .withHttpApp(fileService[IO](FileService.Config("./dist")).orNotFound)
-  .build.use(_ => IO.never).as(ExitCode.Success).unsafeRunSync()
-
+  .build
+  .use(_ => IO.never)
+  .as(ExitCode.Success)
+  .unsafeRunSync()
