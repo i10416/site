@@ -4,7 +4,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 3.90.0"
+      version = "~> 4.15.0"
     }
   }
 
@@ -20,7 +20,7 @@ provider "google" {
 
 
 resource "google_service_account" "deploy_agent" {
-  account_id = "website-deploy-agent"
+  account_id   = "website-deploy-agent"
   display_name = "${var.service_name}_deploy_agent"
 }
 
@@ -29,25 +29,29 @@ resource "google_service_account_key" "deploy_agent_key" {
 }
 
 
-resource "local_file" "deploy_agent_key" {
+
+resource "local_sensitive_file" "deploy_agent_key" {
+  content              = google_service_account_key.deploy_agent_key.private_key
   filename             = "./output/secrets/my-account-key.json"
-  sensitive_content              = google_service_account_key.deploy_agent_key.private_key
   file_permission      = "0600"
   directory_permission = "0755"
 }
 
 resource "google_project_iam_member" "deploy_gcr_rw" {
-  role = "roles/storage.admin"
-  member = "serviceAccount:${google_service_account.deploy_agent.email}"
+  project = var.site_project_id
+  role    = "roles/storage.admin"
+  member  = "serviceAccount:${google_service_account.deploy_agent.email}"
 }
 resource "google_project_iam_member" "deploy_run_agant" {
-  role = "roles/run.serviceAgent"
-  member = "serviceAccount:${google_service_account.deploy_agent.email}"
+  project = var.site_project_id
+  role    = "roles/run.serviceAgent"
+  member  = "serviceAccount:${google_service_account.deploy_agent.email}"
 }
 
 resource "google_project_iam_member" "deploy_run" {
-  role = "roles/run.admin"
-  member = "serviceAccount:${google_service_account.deploy_agent.email}"
+  project = var.site_project_id
+  role    = "roles/run.admin"
+  member  = "serviceAccount:${google_service_account.deploy_agent.email}"
 }
 
 data "google_iam_policy" "public_access" {
@@ -60,13 +64,13 @@ data "google_iam_policy" "public_access" {
 }
 
 resource "google_cloud_run_service_iam_policy" "noauth" {
-  location    = google_cloud_run_service.website.location
-  project     = google_cloud_run_service.website.project
-  service     = google_cloud_run_service.website.name
+  location = google_cloud_run_service.website.location
+  project  = google_cloud_run_service.website.project
+  service  = google_cloud_run_service.website.name
 
   policy_data = data.google_iam_policy.public_access.policy_data
 }
-	
+
 
 resource "google_cloud_run_domain_mapping" "website" {
   location = var.site_project_loc
@@ -75,8 +79,8 @@ resource "google_cloud_run_domain_mapping" "website" {
   metadata {
     namespace = var.site_project_id
 
-    labels =  {
-      scope  = "website"
+    labels = {
+      scope = "website"
     }
   }
 
@@ -90,8 +94,8 @@ resource "google_cloud_run_service" "website" {
 
   metadata {
     namespace = var.site_project_id
-    labels =  {
-      scope  = "website"
+    labels = {
+      scope = "website"
     }
   }
   traffic {
@@ -102,7 +106,7 @@ resource "google_cloud_run_service" "website" {
 
   template {
     spec {
-      service_account_name  = var.run_agent
+      service_account_name = var.run_agent
       containers {
         image = "asia.gcr.io/${var.site_project_id}/cloudrun/${var.service_name}:latest"
       }
