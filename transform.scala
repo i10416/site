@@ -1,7 +1,7 @@
 //> using scala "2.13.8"
 //> using lib "org.planet42::laika-core:0.18.1"
 //> using lib "org.planet42::laika-io:0.18.1"
-//> using lib "org.typelevel::cats-effect:3.3.4"
+//> using lib "org.typelevel::cats-effect:3.3.8"
 
 import java.nio.file.Path
 import java.nio.file.Files
