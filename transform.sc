@@ -6,9 +6,9 @@ import fs2.io.Watcher.Event.Created
 import $ivy.`org.planet42::laika-core:0.18.1`
 import $ivy.`org.planet42::laika-preview:0.18.1`
 import $ivy.`org.planet42::laika-io:0.18.1`
-import $ivy.`org.typelevel::cats-effect:3.3.8`
-import $ivy.`co.fs2::fs2-core:3.2.0`
-import $ivy.`co.fs2::fs2-io:3.2.0`
+import $ivy.`org.typelevel::cats-effect:3.3.11`
+import $ivy.`co.fs2::fs2-core:3.2.7`
+import $ivy.`co.fs2::fs2-io:3.2.7`
 import $ivy.`dev.i10416::petit:0.1.0-SNAPSHOT-b`
 
 import cats.effect.{IO, Async, Sync, Resource}
