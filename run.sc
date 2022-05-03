@@ -1,4 +1,3 @@
-// scala version 2.13.8
 import fs2.io.file.Path
 import fs2.io.Watcher.Event.Deleted
 import fs2.io.Watcher.Event.Modified
@@ -9,7 +8,7 @@ import $ivy.`org.planet42::laika-io:0.18.2`
 import $ivy.`org.typelevel::cats-effect:3.3.11`
 import $ivy.`co.fs2::fs2-core:3.2.7`
 import $ivy.`co.fs2::fs2-io:3.2.7`
-import $ivy.`dev.i10416::petit:0.0.0+43-1c7e2fab+20220503-1630-SNAPSHOT`
+import $ivy.`dev.i10416::petit:0.0.0+60-b1a4fe67+20220503-2103-SNAPSHOT`
 
 import cats.effect.{IO, Async, Sync, Resource}
 import laika.ast.TemplateElement
