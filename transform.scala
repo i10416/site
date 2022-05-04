@@ -40,7 +40,14 @@ object Transform {
     }
     Files.write(
       Path.of("docs/directory.conf"),
-      s"""petit.site.host  = "${System.getenv("SITE_HOST")}"""".getBytes()
+      s"""|
+          |petit.site.host  = "${sys.env
+           .get("SITE_HOST")
+           .getOrElse("localhost")}"
+          |laika.site.metadata.title = "${sys.env
+           .get("SITE_TITLE")
+           .getOrElse("")}"
+          |""".stripMargin.getBytes()
     )
     createTransformer[IO]
       .use { transformer =>
