@@ -24,7 +24,7 @@ jobs:
           source ~/.profile
           mkdir -p deploy/dist
           scala-cli run transform.scala  \
-            --dependency dev.i10416::petit:0.0.0+59-5fb8ef9c-SNAPSHOT \
+            --dependency dev.i10416::petit:0.0.0+62-a6416e18-SNAPSHOT \
             --repo https://s01.oss.sonatype.org/content/repositories/snapshots \
             -- docs deploy/dist
         env:
