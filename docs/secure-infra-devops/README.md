@@ -128,9 +128,20 @@ export TF_SA=...
 ```
 
 ```sh
-gcloud 
+gcloud iam service-accounts create $TF_SA --display-name "ci/cd terraform executor"
 ```
 
+```sh
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member=serviceAccount:terraform-admin@$PROJECT_ID.iam.gserviceaccount.com \\
+  --role=roles/editor
+```
+
+```sh
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member=serviceAccount:terraform-admin@$PROJECT_ID.iam.gserviceaccount.com \\
+  --role=roles/cloudfunctions.admin
+```
 
 ### Pool の作成
 ```sh
@@ -178,7 +189,11 @@ export GH_REPO=
 ```
 
 ```sh
-gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT}" \
+export TF_SERVICE_ACCOUNT=name@project.iam.gserviceaccount.com
+```
+
+```sh
+gcloud iam service-accounts add-iam-policy-binding "${TF_SERVICE_ACCOUNT}" \
   --project="${PROJECT_ID}" \
   --role="roles/iam.workloadIdentityUser" \
   --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${GH_USER}/${GH_REPO}"
@@ -187,7 +202,22 @@ gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT}" \
 
 Github Actions の workflow の設定
 
+note: 
+
+
 ```yaml
+jobs:
+  ci:
+    steps:
+      - name: Authenticate to Google Cloud
+        id: 'google-cloud-auth'
+        uses: 'google-github-actions/auth@v0.4.1'
+        with:
+          create_credentials_file: true
+          workload_identity_provider: "${{ secrets.GCP_WORKLOAD_ID_PROVIDER_ID }}" # $WORKLOAD_IDENTITY_POOL_ID/providers/$OIDC_NAME
+          service_account: "${{ secrets.TF_GCP_SERVICE_ACCOUNT }}"
+      - name: Google Cloud login
+        run: gcloud auth login --brief --cred-file="${{ steps.google-cloud-auth.outputs.credentials_file_path }}"
 ```
 
 
