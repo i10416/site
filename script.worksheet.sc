@@ -9,7 +9,7 @@ import $ivy.`org.planet42::laika-io:0.18.2`
 import $ivy.`org.typelevel::cats-effect:3.3.11`
 import $ivy.`co.fs2::fs2-core:3.2.7`
 import $ivy.`co.fs2::fs2-io:3.2.7`
-import $ivy.`dev.i10416::petit:0.0.0+43-1c7e2fab+20220503-1622-SNAPSHOT`
+import $ivy.`dev.i10416::petit:0.0.0+91-ace789e0+20220925-2152-SNAPSHOT`
 
 import cats.effect.{IO, Async, Sync, Resource}
 import laika.ast.TemplateElement
