@@ -24,11 +24,14 @@ jobs:
           source ~/.profile
           mkdir -p deploy/dist
           scala-cli run transform.scala  \
-            --dependency dev.i10416::petit:0.0.0+73-ebea3edc-SNAPSHOT \
+            --dependency dev.i10416::petit:0.0.0+95-7957ec18-SNAPSHOT \
             --repo https://s01.oss.sonatype.org/content/repositories/snapshots \
             -- docs deploy/dist
         env:
           SITE_HOST: ${{ secrets.SITE_HOST }}
+          SITE_TITLE: ${{ secrets.SITE_TITLE }}
+          SITE_TWITTER: ${{ secrets.SITE_TWITTER}}
+          SITE_GITHUB: ${{ secrets.SITE_GITHUB }}
       - name: GCP Auth
         uses: google-github-actions/setup-gcloud@v0
         with:

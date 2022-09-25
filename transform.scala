@@ -47,6 +47,8 @@ object Transform {
           |laika.site.metadata.title = "${sys.env
            .get("SITE_TITLE")
            .getOrElse("")}"
+          |petit.site.twitter = "${sys.env.get("SITE_TWITTER").getOrElse("")}"
+          |petit.site.github = "${sys.env.get("SITE_GITHUB").getOrElse("")}"
           |""".stripMargin.getBytes()
     )
     createTransformer[IO]
