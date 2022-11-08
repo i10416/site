@@ -33,7 +33,7 @@ jobs:
           SITE_TWITTER: ${{ secrets.SITE_TWITTER}}
           SITE_GITHUB: ${{ secrets.SITE_GITHUB }}
       - name: GCP Auth
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1
         with:
           version: 'latest'
           project_id: ${{ secrets.GCP_PROJECT_ID }}
