@@ -1,7 +1,7 @@
-//> using scala "2.13.8"
+//> using scala "3.2.2"
 //> using lib "org.planet42::laika-core:0.18.2"
 //> using lib "org.planet42::laika-io:0.18.2"
-//> using lib "org.typelevel::cats-effect:3.3.11"
+//> using lib "org.typelevel::cats-effect:3.4.6"
 
 import java.nio.file.Path
 import java.nio.file.Files
@@ -22,7 +22,7 @@ import laika.config.ConfigBuilder
 import cats.effect.kernel.Sync
 import java.nio.charset.Charset
 
-object Transform {
+object Transform:
   private def createTransformer[F[_]: Async]: Resource[F, TreeTransformer[F]] =
     Transformer
       .from(format.Markdown)
@@ -31,13 +31,13 @@ object Transform {
       .withTheme(Petit)
       .build
 
-  def main(arg: Array[String]): Unit = {
-    val (from, to) = arg.toList match {
+  def main(arg: Array[String]): Unit =
+    val (from, to) = arg.toList match
       case from :: to :: Nil
           if Files.exists(Path.of(from)) && Files.exists(Path.of(to)) =>
         (from, to)
       case _ => ("docs", "deploy/dist")
-    }
+
     Files.write(
       Path.of("docs/directory.conf"),
       s"""|
@@ -52,11 +52,6 @@ object Transform {
           |""".stripMargin.getBytes()
     )
     createTransformer[IO]
-      .use { transformer =>
-        transformer.fromDirectory(from).toDirectory(to).transform
-      }
+      .use(_.fromDirectory(from).toDirectory(to).transform)
       .unsafeRunSync()
-  }
-
-}
 // memo https://highlightjs.org/static/demo/
