@@ -38,7 +38,7 @@ resource "google_project_iam_member" "deploy_gcr_rw" {
 }
 resource "google_project_iam_member" "run_agant" {
   project = var.site_project_id
-  role    = "roles/run.serviceAgent"
+  role    = "roles/iam.serviceAccountUser"
   member  = "serviceAccount:${google_service_account.deploy_agent.email}"
 }
 
@@ -48,11 +48,6 @@ resource "google_project_iam_member" "deploy_run" {
   member  = "serviceAccount:${google_service_account.deploy_agent.email}"
 }
 
-resource "google_project_iam_member" "exec_run" {
-  project = var.site_project_id
-  role    = "roles/run.developer"
-  member  = "serviceAccount:${google_service_account.site_run_agent.email}"
-}
 
 data "google_iam_policy" "public_access" {
   binding {
