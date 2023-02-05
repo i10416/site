@@ -32,13 +32,16 @@ jobs:
           SITE_TITLE: ${{ secrets.SITE_TITLE }}
           SITE_TWITTER: ${{ secrets.SITE_TWITTER}}
           SITE_GITHUB: ${{ secrets.SITE_GITHUB }}
-      - name: GCP Auth
-        uses: google-github-actions/setup-gcloud@v1
+      - name: Authenticate to Google Cloud
+        id: 'google-cloud-auth'
+        uses: 'google-github-actions/auth@v1'
         with:
-          version: 'latest'
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
+          token_format: 'access_token'
+          workload_identity_provider: "${{ secrets.GCP_WORKLOAD_ID_PROVIDER_ID }}"
+          service_account: "${{ secrets.TF_GCP_SERVICE_ACCOUNT }}"
+          create_credentials_file: true
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
       - name: Configure docker to use gcloud cli
         run: gcloud auth configure-docker --quiet
       - name: push server image
