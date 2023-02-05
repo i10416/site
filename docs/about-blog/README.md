@@ -1,6 +1,8 @@
 ## サイトの構成
 
-このサイトは GCP の cloud run に nginx コンテナをデプロイして静的ファイルを配信しています. 記事のコンテンツは Scala の Laika というライブラリで markdown ファイルを html に変換しています.
+このサイトは GCP の cloud run に nginx コンテナをデプロイして静的ファイルを配信しています.
+
+記事のコンテンツは Scala の [Laika](https://planet42.github.io/Laika) というライブラリで markdown ファイルを html に変換しています.
 
 インフラ構成は https://github.com/i10416/infra.git と https://github.com/i10416/site.git の infra ディレクトリにある `*.tf` で
 terraform を使って管理しています. `terraform apply` と `terraform destroy` でインフラリソースをまとめて作成・破棄できるので楽しいですね(＾ω＾)
@@ -15,7 +17,7 @@ https://github.com/i10416/petit
 Scala-CLI なら以下のように
 
 ```scala
-// using lib dev.i10416::petit:0.0.0-xxxxx-SNAPSHOT`
+//> using lib "dev.i10416::petit:0.0.0-xxxxx-SNAPSHOT"
 ```
 
 
@@ -116,9 +118,28 @@ Error.
 @:@
 
 
+### 画像
+
+画像は `![alt](path)` または `@:image` ディレクティブで表示できます.
+
+```
+@:image(scala_img.png) {
+  intrinsicWidth = 300
+  intrinsicHeight = 300
+  alt = Scala Logo
+  title = Scala Logo
+}
+```
+
+@:image(scala_img.png) {
+  intrinsicWidth = 300
+  intrinsicHeight = 300
+  alt = Scala Logo
+  title = Scala Logo
+}
+
 ### table
 
 | this | is    | a   | table |
 | ---- | ----- | --- | ----- |
 | and  | these | are | cells |
-
