@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.1.0"
+  required_version = "~> 1.2.0"
 
   required_providers {
     google = {
@@ -23,26 +23,20 @@ resource "google_service_account" "deploy_agent" {
   account_id   = "website-deploy-agent"
   display_name = "${var.service_name}_deploy_agent"
 }
-
-resource "google_service_account_key" "deploy_agent_key" {
-  service_account_id = google_service_account.deploy_agent.name
+resource "google_service_account" "site_run_agent" {
+  account_id   = "website-run-agent"
+  display_name = "${var.service_name}_run_agent"
 }
 
 
 
-resource "local_sensitive_file" "deploy_agent_key" {
-  content              = google_service_account_key.deploy_agent_key.private_key
-  filename             = "./output/secrets/my-account-key.json"
-  file_permission      = "0600"
-  directory_permission = "0755"
-}
 
 resource "google_project_iam_member" "deploy_gcr_rw" {
   project = var.site_project_id
   role    = "roles/storage.admin"
   member  = "serviceAccount:${google_service_account.deploy_agent.email}"
 }
-resource "google_project_iam_member" "deploy_run_agant" {
+resource "google_project_iam_member" "run_agant" {
   project = var.site_project_id
   role    = "roles/run.serviceAgent"
   member  = "serviceAccount:${google_service_account.deploy_agent.email}"
@@ -50,8 +44,14 @@ resource "google_project_iam_member" "deploy_run_agant" {
 
 resource "google_project_iam_member" "deploy_run" {
   project = var.site_project_id
-  role    = "roles/run.admin"
+  role    = "roles/run.developer"
   member  = "serviceAccount:${google_service_account.deploy_agent.email}"
+}
+
+resource "google_project_iam_member" "exec_run" {
+  project = var.site_project_id
+  role    = "roles/run.developer"
+  member  = "serviceAccount:${google_service_account.site_run_agent.email}"
 }
 
 data "google_iam_policy" "public_access" {
