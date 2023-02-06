@@ -1,7 +1,11 @@
 # Good Bye, Gatsby. Hello, Laika!
 
+## Motivation
 
 I used to use Gatsby + Typescript for my websites. However, do I really need clumsy Webpack build pipeline, hacky MDX template and even GraphQL for simple personal website? No. That's why I use [Laika](http://planet42.github.io/Laika/), which is an extensible markup converter with some useful tools written in **Scala**, because I'm tired of JavaScript and love elegance and type safety of Scala. Good bye dirty JS solutions :)
+
+
+## About Laika
 
 Laika is a library for libraries. It provides essential features (e.g. abstract file tree, pluggable interfaces) for building markup conversion libraries.
 
