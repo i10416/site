@@ -1,9 +1,13 @@
 # Good Bye, Gatsby. Hello, Laika!
 
+## Motivation
 
 I used to use Gatsby + Typescript for my websites. However, do I really need clumsy Webpack build pipeline, hacky MDX template and even GraphQL for simple personal website? No. That's why I use [Laika](http://planet42.github.io/Laika/), which is an extensible markup converter with some useful tools written in **Scala**, because I'm tired of JavaScript and love elegance and type safety of Scala. Good bye dirty JS solutions :)
 
-Laika is a library for libraries. It provides essential features (e.g. abstract file tree, pluggable interfaces) for building markup conversion libraries.
+
+## About Laika
+
+Laika is a library for markup conversion libraries created and maintained by [Jens Halm](https://github.com/jenshalm). It is similar to Pandoc in Haskell in terms of markup conversion and Jykell in Ruby in terms of static site generation. It provides essential features (e.g. abstract file tree, pluggable interfaces) for building markup conversion libraries.
 
 It is written in purely functional style using cats-effect with famous Tagless-Final pattern, so it is theoretically possible to switch effect libraries from one to another.
 
