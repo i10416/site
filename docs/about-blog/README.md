@@ -1,6 +1,6 @@
 ## About Site (Infrastructure and Theme)
 
-This site is served from nginx container on GCP Cloud Run. Infrastructure is managed by terraform, which gets rid of my toil(just `terraform apply` to create resources and `terraform destory` to delete resources). 
+This site is served from nginx container on GCP Cloud Run. Infrastructure is managed by terraform, which help me get rid of my toil(just `terraform apply` to create resources and `terraform destory` to delete resources). 
 You can find a part of terraform definition at infra directory in https://github.com/i10416/site. 
 
 
@@ -47,7 +47,7 @@ Option 2, Google App Engine, is not so bad as it has free quota, supports https 
 
 Option 4, Firebase Hosting, is free, fast, and easy, but I'm not a big fan of Firebase.
 
-Considering these options above, I chose option 3, Cloud Run. Cloud Run is loosely coupled with other infrastructure stuffs that it gives me flexibility for build and deploy workflow. For example, you can use GitHub Actions to build and deploy your website while serving website from Cloud Run. This helps me keep infrastructure as simple as possible. After a few months, I'm satisfied with my desicion but I think GCE with nix would be interesting.
+Considering these options above, I chose option 3, Cloud Run. Cloud Run is loosely coupled with other infrastructure stuffs, so it gives me flexibility for build and deploy workflow. For example, I can use GitHub Actions to build and deploy your website while serving website from Cloud Run. This helps me keep infrastructure as simple as possible. After a few months, I'm satisfied with my desicion but I think GCE with nix would be interesting.
 
 
 ## About My Site Theme
@@ -61,7 +61,7 @@ orem ipsum dolor sit amet, __consectetur adipiscing__ elit, sed do **eiusmod** t
 
 ### Syntax Highlighting
 
-My theme has fancy syntax highlight as do other popular static site themes. I'm so accustomed tofancy syntax highlight that I couldn't do without them.
+My theme has fancy syntax highlight as do other popular static site themes. I'm so accustomed to it that I couldn't do without them.
 
 ```scala
 class Foo(val field :Int = 0):

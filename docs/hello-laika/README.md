@@ -2,16 +2,16 @@
 
 ## Motivation
 
-I used to use Gatsby + Typescript for my websites. However, do I really need clumsy Webpack build pipeline, hacky MDX template and even GraphQL for simple personal website? No. That's why I use [Laika](http://planet42.github.io/Laika/), which is an extensible markup converter with some useful tools written in **Scala**, because I'm tired of JavaScript and love elegance and type safety of Scala. Good bye dirty JS solutions :)
+I used to use Gatsby + Typescript for my websites. However, do I really need clumsy Webpack build pipeline, hacky MDX template and even GraphQL for simple personal website? No. That's why I use [Laika](http://planet42.github.io/Laika/), which is an extensible markup converter with some useful tools written in **Scala**. I'm tired of JavaScript and love elegance and type safety of Scala. Good bye dirty JS solutions :)
 
 
 ## About Laika
 
-Laika is a library for markup conversion libraries created and maintained by [Jens Halm](https://github.com/jenshalm). It is similar to Pandoc in Haskell in terms of markup conversion and Jykell in Ruby in terms of static site generation. It provides essential features (e.g. abstract file tree, pluggable interfaces) for building markup conversion libraries.
+Laika is a library for markup conversion created and maintained by [Jens Halm](https://github.com/jenshalm). It is similar to Pandoc in Haskell in terms of markup conversion and Jykell in Ruby in terms of static site generation. It provides essential features (e.g. abstract file tree, pluggable interfaces) for building markup conversion libraries.
 
-It is written in purely functional style using cats-effect with famous Tagless-Final pattern, so it is theoretically possible to switch effect libraries from one to another.
+It is written in purely functional style using cats-effect with Tagless-Final pattern, so it is possible to switch effect libraries from one to another though I didn't try it.
 
-You can programatically manupulate contents in input directories using abstract file tree. You can regard this feature as functionality Gatsby provides via GraphQL. 
+You can programatically manupulate contents in input directories using abstract file tree. This is the equivalent to what Gatsby provides via GraphQL.
 
 
 For example, the following code snippet shows how to mount local file at `./src/theme.css` to `/css/theme.css` in virtual tree.
@@ -26,7 +26,7 @@ InputTree
     └── theme.css
 ```
 
-Now that `InputTree` has theme.css, developer can use that file as if it is located at `/css/theme.css`.
+Now that `InputTree` has theme.css, developer can use that file as if it was located at `/css/theme.css`.
 
 you can read and edit contents from input directories and even dynamically generate contents via virtual tree. Laika provides us with builtin toolkits for tree conversion (`ExtensionBundle`, `Directive`).
 
@@ -59,7 +59,11 @@ def myThemeBuilder[F[_]: Sync] = ThemeBuilder
   .build
 ```
 
-Tree processor is just a Klisli, alias for `A => F[B]`, which uses value of type `A` and returns value of type `B` in the context of `F`.
+Now let's look through some components.
+
+### Tree Processor
+
+Tree processor is just a [Kleisli](https://typelevel.org/cats/datatypes/kleisli.html), alias for `A => F[B]`, which uses value of type `A` and returns value of type `B` in the context of `F`.
 
 For example, fetching OGP for a link in a document from web is `URL => IO[OGP]`. `IO` indicates that it perform `IO` effect and thus it is not deterministic and may fail due to errors like network connection error.
 
@@ -103,9 +107,11 @@ private def addListPage[F[_]: Sync]: Theme.TreeProcessor[F] = Kleisli {
       implicitly[Sync[F]].pure(newTree)
 ```
 
+### Extension
+
 Extension may contain custom directives.
 
-For example, you can define `Directive` that dynamically generates link to previous/next post for a post.
+For example, you can define a `Directive` that dynamically generates link to previous/next post for a post.
 
 ```scala
 val prevDoc = Templates.create("prevDoc") {
@@ -125,7 +131,7 @@ val nextDoc = Templates.create("nextDoc") {
 }
 ```
 
-`Templates.create(...)` defines `pervDoc` Directive for template file. When Laika finds `prevDoc` While conversion, Laika looks up a post previous to the post with `prevDoc` directive and replace `prevDoc` with link to the previous document.
+`Templates.create(...)` defines `pervDoc` Directive for template file. When Laika finds `prevDoc` While conversion, Laika looks up a post previous to the one with `prevDoc` and replace `prevDoc` with link to the previous document.
 
 `cursor` allows access to documents and configurations. It is natural that cursor API is similar to json libraries like Circe or Argonaut because all of them provide abstraction for manipulating tree structure.
 
@@ -140,16 +146,16 @@ object MyDirectives extends DirectiveRegistry {
 
 ```
 
-`DirectiveRegistry` consists of a set of Directives, each of which has dedicated purpose. `prevDoc` and `nextDoc` is supposed to be used in templates, I added them to `templateDirectives`.
+`DirectiveRegistry` consists of a set of `Directive`s, each of which has dedicated purpose. `prevDoc` and `nextDoc` belongs to `templateDirectives` as they are supposed to be used in template files.
 
 You can register `MyDirective` to theme via `addExtensions` method. With that theme, you can generate link to previous/next post in template using `@:prevDoc` or `@nextDoc`.
 
 Now, the question is, how to debug/use this theme?
 
 
-The simplest way is to use `Transformer`. I recommend you `pulishLocal` your theme and debug it with Scala CLI or ammonite script as you usually want to check look-and-feels of your theme in fast-feedback-loop.
+The simplest way is to use `Transformer`. I recommend you `pulishLocal` your theme and debug it with Scala CLI or ammonite script as you usually want to check look-and-feels of your theme in fast feedback loop.
 
-The following snippet shows the simple way to create and use your(my) theme`Transformer`.
+The following snippet shows the simple way to create and use your(my) theme `Transformer`.
 
 ```scala
 def createTransformer[F[_]: Async]: Resource[F, TreeTransformer[F]] =
@@ -171,6 +177,8 @@ createTransformer[IO]
   .unsafeRunSync()
 ```
 It is self explanatory. It reads `*.md` from `src` directory, converts them to `html` and emits in `dist` directory.
+
+### Template
 
 Layout is determined by theme's default template or `default.template.html` in `src` directory.
 
@@ -220,3 +228,8 @@ For instance, the following template render markup content after conversion usin
   </div>
 </body>
 ```
+
+
+## Conclusion
+
+If you want to build a static website and look for a SSG with nicer experience, give Laika a try. If `IO` or `F[_]` feels intimidate, there are a lot of resources that demystify them. Docs for cats https://typelevel.org/cats/ and cats-effect https://typelevel.org/cats-effect/ are the good starting points.
