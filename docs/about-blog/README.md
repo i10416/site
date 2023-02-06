@@ -1,34 +1,28 @@
-## サイトの構成
+## About Site (Infrastructure and Theme)
 
-このサイトは GCP の cloud run に nginx コンテナをデプロイして静的ファイルを配信しています.
-
-記事のコンテンツは Scala の [Laika](https://planet42.github.io/Laika) というライブラリで markdown ファイルを html に変換しています.
-
-インフラ構成は https://github.com/i10416/infra.git と https://github.com/i10416/site.git の infra ディレクトリにある `*.tf` で
-terraform を使って管理しています. `terraform apply` と `terraform destroy` でインフラリソースをまとめて作成・破棄できるので楽しいですね(＾ω＾)
-
-また、ウェブサイトのスタイルはテーマにしてライブラリとして公開しているのでディレクトリ構成を揃えれば誰でもｼｭｯと使えるはずです.
-
-ソースは以下のレポジトリに置いてあります. 気が向いたらスターしてほしいですね❤
-
-https://github.com/i10416/petit
+This site is served from nginx container on GCP Cloud Run. Infrastructure is managed by terraform, which gets rid of my toil(just `terraform apply` to create resources and `terraform destory` to delete resources). 
+You can find a part of terraform definition at infra directory in https://github.com/i10416/site. 
 
 
-Scala-CLI なら以下のように
+
+All blog posts are generated from Markdown using elegant Scala library: [Laika](https://planet42.github.io/Laika). Taking advantage of Laika's flexitibity, this site uses my custom theme(that is also written in Scala!). My theme provides some essential features like custom snippets, syntax highlighting and so on. If you're interested, visit https://github.com/i10416/petit and give it a star⭐️.
+
+You can fetch my theme from snapshot reopsitory.
+
+Scala CLI:
 
 ```scala
 //> using lib "dev.i10416::petit:0.0.0-xxxxx-SNAPSHOT"
 ```
 
-
-ammonite script なら以下のように,
+ammonite script:
 
 ```scala
 import $ivy.`dev.i10416::petit:0.0.0-xxxxx-SNAPSHOT`
 ```
 
 
-`build.sbt` なら以下のように
+`build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
@@ -36,68 +30,85 @@ libraryDependencies ++= Seq(
 )
 ```
 
-と書いてダウンロードできます.
+## Some Thought on Hosting Static Website on GCP
+There are several options when you want to host a static website on GCP.
 
-ディレクトリ構成などは https://github.com/i10416/site を参考に.
+For example,
 
-## GCP で 静的サイトをホスティングするときのユースケース
+1. cloud storage + load balancer
+2. app engine
+3. cloud run
+4. firebase hosting
 
-さて、GCPで静的サイトをホスティングしようと思ったら次のようなユースケースが考えられます.
-選択肢は
+Option 1 is costly when your site traffic is small because load balancer and permanent IP address are expensive compared to their benefit.
+(Of course, if your site must handle large traffic, cost for cloud strage + load balancer will pay).
 
-1: cloud storage + load balancer
+Option 2, Google App Engine, is not so bad as it has free quota, supports https and it is quite easy to deploy. However I prefer simple container deployment rather than app.yaml and Cloud Build, which is tied to GAE.
 
-2: app engine
+Option 4, Firebase Hosting, is free, fast, and easy, but I'm not a big fan of Firebase.
 
-3: cloud run
+Considering these options above, I chose option 3, Cloud Run. Cloud Run is loosely coupled with other infrastructure stuffs that it gives me flexibility for build and deploy workflow. For example, you can use GitHub Actions to build and deploy your website while serving website from Cloud Run. This helps me keep infrastructure as simple as possible. After a few months, I'm satisfied with my desicion but I think GCE with nix would be interesting.
 
-4: firebase hosting
 
-1 は小規模なサイトだとロードバランサや固定 IP のコストがバカにならないので個人の静的ウェブサイトをホストするのには向いていないです. ちなみにスケールが大きくなれば cloud storage + load balancer の構成のコスパがいいはずです.
+## About My Site Theme
 
-2 は 無料枠、https 対応があり、app.yaml と gcloud コマンドさえあればほぼすぐにウェブサイトを公開できるくらいに簡単だが、terraform などの外部ツールとの食い合わせがやや悪いです. 小規模なシステムなので cloud build による自動ビルドと app engine へのデプロイはオーバーキルですね.
+This site uses [my custom theme](https://github.com/i10416/petit) for Laika.
+My theme has essential features for common static website.
 
-4 は安い・速い・楽の牛丼屋さんの三点セットがそろっているが面白みに欠けます.
-
-3 はコンテナ以外の要素については自由に選択できるのでうれしいですね. 例えばビルドとデプロイは github actions で、ホスティングは cloud run で、といった使い分けがしやすいです. お陰で terraform による構成管理も複雑にならないというおまけつき. ということでこのサイトは github actions と cloud run を使って管理することにしています.
-
-## サイトの機能
-
-よくある静的サイトの機能は一通り備えています.
-
-### テキスト
+### Rendering Text with Some Decoration
 
 orem ipsum dolor sit amet, __consectetur adipiscing__ elit, sed do **eiusmod** tempor incididunt ~~ut labore~~ et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
 
-### シンタックスハイライト
+### Syntax Highlighting
 
-しばしばコードスニペットを書くのでシンタックスハイライトは Must です.
+My theme has fancy syntax highlight as do other popular static site themes. I'm so accustomed tofancy syntax highlight that I couldn't do without them.
 
 ```scala
-class Hoge(val a :Int = 0) {
-  @main
-  def main(args:Array[String]) :Unit = ???
-}
+class Foo(val field :Int = 0):
+  @annotation
+  def main(args: Array[String]): Unit = ???
+
 // this is comment
 println("hello, my theme!")
-lazy val hoge = {
+lazy val hoge =
   println("this is evaluated lazily")
   1
-}
 ```
 
-### 引用
+### table
+
+```
+
+| this | is    | a   | table |
+| ---- | ----- | --- | ----- |
+| and  | these | are | cells |
+```
+
+
+| this | is    | a   | table |
+| ---- | ----- | --- | ----- |
+| and  | these | are | cells |
+
+
+### Quote
 
 > this is a quote
 >
 > foo bar
 
 
-### Info,Warning など
+### Custom Snippets
 
-Directive という Laika の機能を使うと以下の `info`, `warning`, `error`  のような拡張シンタックスが使えます.
+@:callout(info)
+`callout`
+@:@
 
-他にもいろいろな機能があるので詳細については https://planet42.github.io/Laika/0.18/07-reference/01-standard-directives.html を見てほしい.
+
+
+Laika has a concept of "Directive", which enables us to extend markup language syntax.
+"Directive" is a kind of function injected in render pipeline.
+
+Laika has a lot of nice builtin Directives, visit https://planet42.github.io/Laika/0.18/07-reference/01-standard-directives.html for more details.
 
 ```
 @:callout(info)
@@ -118,9 +129,9 @@ Error.
 @:@
 
 
-### 画像
+### Image
 
-画像は `![alt](path)` または `@:image` ディレクティブで表示できます.
+You can embed image by `![alt](path)` as you do in GitHub flavor markdown or `@:image` directive.
 
 ```
 @:image(scala_img.png) {
@@ -138,8 +149,3 @@ Error.
   title = Scala Logo
 }
 
-### table
-
-| this | is    | a   | table |
-| ---- | ----- | --- | ----- |
-| and  | these | are | cells |

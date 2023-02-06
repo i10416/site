@@ -1,48 +1,46 @@
 # Good Bye, Gatsby. Hello, Laika!
 
-以前のブログは Gatsby+TypeScript というアリがちな構成だったが、チョットしたウェブサイトを作るのにホントに graphql が必要なのかと胸に手を当てて考えてみるとそんなことはないという結論に至ってしまった. 
-というわけで Scala 使いの信仰を試す意味もあって[Laika](http://planet42.github.io/Laika/) でブログを作ったった(＾ω＾)
+
+I used to use Gatsby + Typescript for my websites. However, do I really need clumsy Webpack build pipeline, hacky MDX template and even GraphQL for simple personal website? No. That's why I use [Laika](http://planet42.github.io/Laika/), which is an extensible markup converter with some useful tools written in **Scala**, because I'm tired of JavaScript and love elegance and type safety of Scala. Good bye dirty JS solutions :)
+
+Laika is a library for libraries. It provides essential features (e.g. abstract file tree, pluggable interfaces) for building markup conversion libraries.
+
+It is written in purely functional style using cats-effect with famous Tagless-Final pattern, so it is theoretically possible to switch effect libraries from one to another.
+
+You can programatically manupulate contents in input directories using abstract file tree. You can regard this feature as functionality Gatsby provides via GraphQL. 
 
 
-さて、[Laika](http://planet42.github.io/Laika/) は Scala で書かれたマークアップ変換ツールです.
-(Gatsby よりもメタな、SSG を作るためのライブラリといってもいいかもしれない.) Tagless-Final パターンを使っているので
-実行時に cats-effect の IO や Monix Task を差し替えることができます.
-
-
-入力したディレクトリやファイルの操作は仮想ツリー上で行います. この仕組みのおかげで Gatsby で graphql を使って処理していた機能を、
-仮想的なディレクトリ構造(木構造)の変換として処理することができます.
-例えば以下のコードは、手元の `src` ディレクトリにある `theme.css` を仮想ディレクトリツリーの `root/css/theme.css` にマウントします.
-
-
-```
-└── src
-    └── theme.css
-```
-
-
-開発者はこのInputTreeで`theme.css` をマウントした仮想ツリーから `theme.css` にアクセスすることができます.
+For example, the following code snippet shows how to mount local file at `./src/theme.css` to `/css/theme.css` in virtual tree.
 
 ```scala
 InputTree
   .apply[F].addFile("./src/theme.css",Path.Root / "css" / "theme.css")
 ```
 
-仮想ツリーの操作を介して OGP の生成やページの動的な生成もできます.
+```
+└── src
+    └── theme.css
+```
 
-また、Laika には変換処理などをまとめた ExtensionBundle や Directive という概念があります. これは開発者がテーマを作りやすくするために提供されているAPIです.
+Now that `InputTree` has theme.css, developer can use that file as if it is located at `/css/theme.css`.
+
+you can read and edit contents from input directories and even dynamically generate contents via virtual tree. Laika provides us with builtin toolkits for tree conversion (`ExtensionBundle`, `Directive`).
+
 
 ```scala
+
 import laika._
 import laika.directive.std.StandardDirectives
 import laika.markdown.github.GitHubFlavor
 import laika.parse.code.SyntaxHighlighting
 ```
 
-Directives は markup(例えば、`markdown`) や template(例えば、`default.template.html`)
-に埋め込んで文書を拡張するための概念です.
+Directives can be embedded in markup(e.g. `markdown`) or template(e.g.`default.template.html`) to provide rich features like custom snippet in markup or dynamically change template from config.
 
-Laikaでは以下のように自作のテーマを作ることができます.  
-テーマに Directives を渡すことで テンプレートやマークアップから Directive を使えるようになります.
+
+Laika exposes APIs useful for theme authors.
+
+Theme can be built from extensions, static assets(template, css, js and images), configuration and tree processors as shown below.
 
 ```scala
 def style[F[_]:Sync] = InputTree
@@ -57,126 +55,11 @@ def myThemeBuilder[F[_]: Sync] = ThemeBuilder
   .build
 ```
 
-たとえば、ある記事の直前のページ・直後のページへのリンクを動的に生成する Directive は次のように定義できます.
+Tree processor is just a Klisli, alias for `A => F[B]`, which uses value of type `A` and returns value of type `B` in the context of `F`.
 
-```scala
-val prevDoc = Templates.create("prevDoc") {
-  cursor.map { cursor =>
-    cursor.previousDocument.fold[TemplateSpan](TemplateElement(Deleted(Nil))) {
-      d => TemplateElement(SpanLink(d.target.title.getOrElse(SpanSequence(Text(d.path.toString)+:Nil)) +:Nil,InternalTarget(laika.ast.PathBase.parse(d.path.toString))))
-    }
-  }
-}
+For example, fetching OGP for a link in a document from web is `URL => IO[OGP]`. `IO` indicates that it perform `IO` effect and thus it is not deterministic and may fail due to errors like network connection error.
 
-val nextDoc = Templates.create("nextDoc") {
-  cursor.map { cursor =>
-    cursor.nextDocument.fold[TemplateSpan](TemplateElement(Deleted(Nil))) {
-      d => TemplateElement(SpanLink(d.target.title.getOrElse(SpanSequence(Text(d.path.toString)+:Nil)) +:Nil,InternalTarget(laika.ast.PathBase.parse(d.path.toString))))
-    }
-  }
-}
-```
-
-`Templates.create(...)`で、テンプレートファイルから呼び出せる`prevDoc`というDirectivesを作成しています. Laika がマークアップを変換するタイミングで`prevDoc`を見つけると、そのマークアップファイルを基準にして直前のドキュメントの情報を取得してドキュメントの内容を書き換えます.
-
-`cursor` はドキュメントやその周りのドキュメントの情報にアクセスできます. 木構造を操作するための API なので Scala の Json ライブラリの Circe や Argonaut に似た API 設計になっています.
-
-
-```scala
-
-object MyDirectives extends DirectiveRegistry {
-  val spanDirectives = Seq()
-  val blockDirectives = Seq()
-  val templateDirectives = Seq(prevDoc,nextDoc)
-  val linkDirectives = Seq()
-}
-
-```
-
-
-この theme の `addExtensions(MyDirectives)` で Directives を登録すれば、テンプレートから `@:prevDoc`,`@:nextDoc` を使って前後の記事へのリンクを生成することができます.
-
-
-theme は、directives, css, js やテンプレートなどの静的アセット、文書の仮想的なディレクトリ構造を保持するツリーの変換器(TreeProcessor)などを持っています.
-
-
-
-入力フォーマット、出力フォーマット、テーマを指定してマークアップ変換処理を定義できます.
-
-```scala
-def createTransformer[F[_]: Async]: Resource[F, TreeTransformer[F]] =
-  Transformer
-    .from(format.Markdown)
-    .to(format.HTML)
-    .parallel[F]
-    .withTheme(new theme.ThemeProvider {
-      def build[F[_]: Sync]: Resource[F, Theme[F]] = myThemeBuilder
-    })
-    .build
-```
-
-
-```scala
-createTransformer[IO]
-  .use { transformer =>
-    transformer.fromDirectory("src").toDirectory("dist").transform
-  }
-  .unsafeRunSync()
-```
-
-これは `src`ディレクトリにある `*.md` ファイルを `dist` ディレクトリに HTML 形式に変換して出力します.
-
-文書のレイアウトはテーマが定義するデフォルトのレイアウトか `src` ディレクトリに置かれた `default.template.html` に従います.
-
-```laika-html
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>${cursor.currentDocument.title}</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      @:linkCSS { paths = ${simple.site.includeCSS} }
-  </head>
-  <body>
-    <nav id="drawer">
-      
-      @:navigationTree {
-        entries = [ 
-          { target = "/", excludeRoot = true, excludeSections = true, depth = 2 } 
-        ]
-      }
-  </nav>
-    <div id="content" class="content">
-      <div id="article">
-      ${cursor.currentDocument.content}
-      </div>
-    </div>
-  </body>
-</html>
-
-```
-
-次のようなテンプレートファイル(`articles.template.html`)とScalaのコードで動的にページを生成することもできます.
-
-
-```laika-html
-<body>
-  <div class="row">
-    <div class="spacer"></div>
-    <div class="entries">
-      <h1>articles</h1>
-      ${cursor.currentDocument.content}
-    </div>
-    <div class="spacer"></div>
-  </div>
-</body>
-```
-
-Klisli とは `A => F[B]` をあらわしています. つまり、型Aの値を受け取ってなんらかの副作用を伴って型Bの値を返す処理を意味します.
-たとえば、コンテンツを受け取って記事にurlが含まれていたら HTTP リクエストを送って OGP 情報を取得する処理は Klisli で表現できます.
-
-この場合は、副作用を含まないので型を合わせるために `Sync[F].pure` で `F` の文脈で返り値を包みます.
+Considering `addListPage`, it is effect-less, justs collects and lists contents in tree in a deterministic way, it uses `Sync[F].pure` to lift value to the context of `F`.
 
 ```scala
 private def addListPage[F[_]: Sync]: Theme.TreeProcessor[F] = Kleisli {
@@ -212,4 +95,124 @@ private def addListPage[F[_]: Sync]: Theme.TreeProcessor[F] = Kleisli {
             .build
         )
       )
+      // do some conversion...
+      implicitly[Sync[F]].pure(newTree)
+```
+
+Extension may contain custom directives.
+
+For example, you can define `Directive` that dynamically generates link to previous/next post for a post.
+
+```scala
+val prevDoc = Templates.create("prevDoc") {
+  cursor.map { cursor =>
+    cursor.previousDocument.fold[TemplateSpan](TemplateElement(Deleted(Nil))) {
+      d => TemplateElement(SpanLink(d.target.title.getOrElse(SpanSequence(Text(d.path.toString)+:Nil)) +:Nil,InternalTarget(laika.ast.PathBase.parse(d.path.toString))))
+    }
+  }
+}
+
+val nextDoc = Templates.create("nextDoc") {
+  cursor.map { cursor =>
+    cursor.nextDocument.fold[TemplateSpan](TemplateElement(Deleted(Nil))) {
+      d => TemplateElement(SpanLink(d.target.title.getOrElse(SpanSequence(Text(d.path.toString)+:Nil)) +:Nil,InternalTarget(laika.ast.PathBase.parse(d.path.toString))))
+    }
+  }
+}
+```
+
+`Templates.create(...)` defines `pervDoc` Directive for template file. When Laika finds `prevDoc` While conversion, Laika looks up a post previous to the post with `prevDoc` directive and replace `prevDoc` with link to the previous document.
+
+`cursor` allows access to documents and configurations. It is natural that cursor API is similar to json libraries like Circe or Argonaut because all of them provide abstraction for manipulating tree structure.
+
+```scala
+
+object MyDirectives extends DirectiveRegistry {
+  val spanDirectives = Seq()
+  val blockDirectives = Seq()
+  val templateDirectives = Seq(prevDoc,nextDoc)
+  val linkDirectives = Seq()
+}
+
+```
+
+`DirectiveRegistry` consists of a set of Directives, each of which has dedicated purpose. `prevDoc` and `nextDoc` is supposed to be used in templates, I added them to `templateDirectives`.
+
+You can register `MyDirective` to theme via `addExtensions` method. With that theme, you can generate link to previous/next post in template using `@:prevDoc` or `@nextDoc`.
+
+Now, the question is, how to debug/use this theme?
+
+
+The simplest way is to use `Transformer`. I recommend you `pulishLocal` your theme and debug it with Scala CLI or ammonite script as you usually want to check look-and-feels of your theme in fast-feedback-loop.
+
+The following snippet shows the simple way to create and use your(my) theme`Transformer`.
+
+```scala
+def createTransformer[F[_]: Async]: Resource[F, TreeTransformer[F]] =
+  Transformer
+    .from(format.Markdown)
+    .to(format.HTML)
+    .parallel[F]
+    .withTheme(new theme.ThemeProvider {
+      def build[F[_]: Sync]: Resource[F, Theme[F]] = myThemeBuilder
+    })
+    .build
+```
+
+```scala
+createTransformer[IO]
+  .use { transformer =>
+    transformer.fromDirectory("src").toDirectory("dist").transform
+  }
+  .unsafeRunSync()
+```
+It is self explanatory. It reads `*.md` from `src` directory, converts them to `html` and emits in `dist` directory.
+
+Layout is determined by theme's default template or `default.template.html` in `src` directory.
+
+```laika-html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>${cursor.currentDocument.title}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      @:linkCSS { paths = ${simple.site.includeCSS} }
+  </head>
+  <body>
+    <nav id="drawer">
+      
+      @:navigationTree {
+        entries = [ 
+          { target = "/", excludeRoot = true, excludeSections = true, depth = 2 } 
+        ]
+      }
+  </nav>
+    <div id="content" class="content">
+      <div id="article">
+      ${cursor.currentDocument.content}
+      </div>
+    </div>
+  </body>
+</html>
+
+```
+
+You can access document information in template using cursor.
+
+For instance, the following template render markup content after conversion using `cursor.currentDocument.content`.
+
+
+```laika-html
+<body>
+  <div class="row">
+    <div class="spacer"></div>
+    <div class="entries">
+      <h1>articles</h1>
+      ${cursor.currentDocument.content}
+    </div>
+    <div class="spacer"></div>
+  </div>
+</body>
 ```
