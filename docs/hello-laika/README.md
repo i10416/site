@@ -7,7 +7,7 @@ I used to use Gatsby + Typescript for my websites. However, do I really need clu
 
 ## About Laika
 
-Laika is a library for libraries. It provides essential features (e.g. abstract file tree, pluggable interfaces) for building markup conversion libraries.
+Laika is a library for markup conversion libraries created and maintained by [Jens Halm](https://github.com/jenshalm). It is similar to Pandoc in Haskell in terms of markup conversion and Jykell in Ruby in terms of static site generation. It provides essential features (e.g. abstract file tree, pluggable interfaces) for building markup conversion libraries.
 
 It is written in purely functional style using cats-effect with famous Tagless-Final pattern, so it is theoretically possible to switch effect libraries from one to another.
 
